@@ -27,6 +27,7 @@ The following softwares are required to run the app:
       + multivariate analysis: pls, caret, kernlab, randomForest, Cubist, earth, prospectr
       + data reshape and summary: data.table, psych, reshape2, plyr
       + misc: tools, markdown, R.utils, foreach, Rcpp, RcppArmadillo
+  * Java (used in the R.matlab package) : it needs to be installed with the same arch than R install
   * An internet browser (IE is not supported)
 
 Start R and run the following code:
