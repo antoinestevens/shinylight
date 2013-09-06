@@ -3,7 +3,7 @@ options(width = 125)
 options(shiny.maxRequestSize=100*1024^2) # max upload size to 100 Mo
 
 options(repos = "http://cran.rstudio.com/")
-libs <- c("shiny", "pls", "caret", "tools", "ggplot2", "psych","data.table","foreach","R.matlab","rJava"
+libs <- c("shiny", "pls", "caret", "tools", "ggplot2", "psych","data.table","foreach","R.matlab","rJava",
 	        "gridExtra", "reshape2", "plyr", "markdown", "R.utils","kernlab","prospectr","xlsx",
           "lattice","hexbin","RColorBrewer","randomForest","Cubist","earth","kernlab","Rcpp","RcppArmadillo")
 

@@ -34,7 +34,7 @@ Start R and run the following code:
 ```
 install.packages('shiny')
 library(shiny)
-runGitHub('antoinestevens','shinylight')
+runGitHub('shinylight','antoinestevens')
 ```
 
 This will download the app from [GitHub](https://github.com/antoinestevens/shinylight/archive/master.zip) in a temporary folder and open it in the default browser. The app can be also downloaded in a user-defined folder (for later use) and run with following piece of code:
