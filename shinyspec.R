@@ -179,26 +179,6 @@ plotAndSave_old <- function(p,fname,w,h,saveAs,b){
   )
 }
 
-plotAndSave <- function(p,fname,w,h,saveAs,b,view_w=100,view_h=100){
-  #p = plot
-  #b = button
-  div(plotOutput(p,view_w,view_h),
-    div(class="row-fluid",
-      div(class="span8",
-        div(class="span4",textInput(fname,"File name",value = "")),
-        div(class="span2",selectInput(saveAs, "Ext.", choices = c('pdf','png'), selected = NULL, multiple = FALSE)),
-        tags$style(type='text/css', paste0("#",saveAs," { width: 85px;}")),
-        tags$style(type='text/css', paste0("#",fname," { width: 135px;}")),  
-        div(class="span2",numericInput(w,"width (in)",value = "8"),tags$style(type='text/css', paste0("#",w," { width: 70px;}"))),
-        div(class="span2",numericInput(h,"height (in)",value = "8"),tags$style(type='text/css', paste0("#",h," { width: 70px;}"))),
-        div(class="span2",downloadButton(b, 'Save plot')),
-        tags$style(type='text/css', paste0("#",b," {margin-top:24px ; width: 70px;}"))
-      )
-    )
-  )
-}
-
-
 # plot equation and r2 on ggplot2 
 # (based on SO http://stackoverflow.com/questions/7549694/ggplot2-adding-regression-line-equation-and-r2-on-graph)
 lm_eqn <- function(mm) {  
