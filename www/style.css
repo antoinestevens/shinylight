@@ -1,0 +1,28 @@
+label.radio { 
+  display: inline-block; 
+}
+
+.radio input[type="radio"] { 
+  float: none; 
+}
+
+.well { 
+  padding: 12px; 
+  margin-bottom: 5px; 
+  max-width: 350px; 
+}
+
+.span4 { 
+  max-width: 350px; 
+}
+
+.jslider { 
+  max-width: 300px; 
+}
+
+textarea, select{
+    width: 100%;
+}
+input{
+    width: 230px;
+}
