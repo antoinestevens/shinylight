@@ -46,9 +46,9 @@ output$dataviewer <- renderTable({
   if(is.null(input$datasets) || is.null(input$columns) || is.null(getdata_sel())) return()
   
   dat <- getdata_sel()
-  
-  if(!is.null(transform()))
-    dat <- cbind(dat,transform())
+  tr <- transform()
+  if(!is.null(tr))
+    dat <- cbind(dat,tr)
   # Show only the selected columns and no more than 50 rows at a time
   nr <- min(input$nrRows,nrow(dat))
   dat[max(1,nr-50):nr, ]

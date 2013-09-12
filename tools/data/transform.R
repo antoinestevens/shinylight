@@ -58,7 +58,7 @@ output$ui_transform <- renderUI({
 # Reactive's 
 # -----------------------------------
 
-transform <- reactive({
+transform <- function(){
 	if(is.null(input$datasets) || is.null(input$tr_transfunction) || is.null(input$tr_copyAndPaste)) return()
 	if(input$tr_transfunction == '' && input$tr_copyAndPaste == '') return()
   if(is.null(getdata_sel())) return()   
@@ -92,7 +92,7 @@ transform <- reactive({
 		names(dat)[names(dat)==input$columns] <- rcom
 	}
   dat
-})
+}
 
 observe({
 	if(is.null(input$addtrans) || input$addtrans == 0) return()

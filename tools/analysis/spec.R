@@ -241,12 +241,12 @@ getspec <- reactive({
 })
 
 # Return the requested spectral matrix only for vizualisation
-getspec_viz <- reactive({
+getspec_viz <- function(){
   if(is.null(input$datasets)|is.null(input$spec_columns)|is.null(getspec())) 
     return()
   
   getspec()[as.numeric(input$spec_nrRows),] 
-})
+}
 
 
 col_spec <- reactive({
@@ -394,10 +394,11 @@ plotS <- function(){
 }
 
 plotStr <- function(){
-  if(is.null(getspec_trans()))
+  gt <- getspec_trans(viz=T)
+  if(is.null(gt))
     return()
   
-  dat <- as.data.frame(getspec_trans(viz=T))
+  dat <- as.data.frame(gt)
   wav <- as.numeric(colnames(dat))
   p <- plotSpectra(dat,wav=wav,group=as.factor(input$spec_nrRows),
                    wr=input$x_slider_spec,xlab=input$spec_xlab,
