@@ -240,6 +240,15 @@ getspec <- reactive({
   dat
 })
 
+# Return the requested spectral matrix only for vizualisation
+getspec_viz <- reactive({
+  if(is.null(input$datasets)|is.null(input$spec_columns)|is.null(getspec())) 
+    return()
+  
+  getspec()[as.numeric(input$spec_nrRows),] 
+})
+
+
 col_spec <- reactive({
   if(is.null(input$datasets)|is.null(getspec())) 
     return()    
@@ -253,7 +262,7 @@ NumCh <- reactive({
 })
 
 # Transform the spectral matrix
-getspec_trans <- reactive({
+getspec_trans <- function(viz=F){
   if(is.null(getspec())|is.null(input$spec_fun)|is.null(NumCh())) 
     return()
   if(input$spec_fun=='')
@@ -263,60 +272,65 @@ getspec_trans <- reactive({
   
   wav <- as.numeric(col_spec())
   
+  if(viz)
+    q <- quote(getspec()[as.numeric(input$spec_nrRows),])
+  else
+    q <- quote(getspec())
+  
   if (input$spec_fun %in%c("snv","AA","RR","SC","CEN","SCCEN")){
-    CALL <- call(input$spec_fun,quote(getspec()))  
+    CALL <- call(input$spec_fun,q)  
     dat <- eval(CALL)
   } else if (input$spec_fun == "detrend"){
-    CALL <- call("detrend",quote(getspec()),wav)      
+    CALL <- call("detrend",q,wav)      
     dat <- eval(CALL)
   }  else if (grepl("badBands",input$spec_fun)){
     if(is.null(input$action_bb)|input$action_bb==0) return()          
     isolate({              
       bb <- eval(parse(text=input$bb))
-      CALL <- call(input$spec_fun,quote(getspec()),wav=wav,bb=bb)
+      CALL <- call(input$spec_fun,q,wav=wav,bb=bb)
       dat <- eval(CALL)
     })
   } else if (input$spec_fun == "sg"){
-    CALL <- call("savitzkyGolay",quote(getspec()),input$m,input$p,input$w,delta.wav=input$si)   
+    CALL <- call("savitzkyGolay",q,input$m,input$p,input$w,delta.wav=input$si)   
     dat <- eval(CALL)
   } else if (input$spec_fun == "gd"){
-    CALL <- call("gapDer",quote(getspec()),input$m_gd,input$w_gd,input$s_gd,delta.wav=input$si_gd)
+    CALL <- call("gapDer",q,input$m_gd,input$w_gd,input$s_gd,delta.wav=input$si_gd)
     dat <- eval(CALL)
   } else if (input$spec_fun == "splcorr"){
     if(is.null(input$action_spl)|input$action_spl==0) return()
     isolate({      
       try(splice <- eval(parse(text=input$splice)))      
-      CALL <- call("spliceCorrection",quote(getspec()),wav,splice)
+      CALL <- call("spliceCorrection",q,wav,splice)
       dat <- eval(CALL)
     })
   } else if (input$spec_fun == "cr"){    
     type <- substr(input$type_cr,1,1)              
-    CALL <- call("continuumRemoval",quote(getspec()),wav,type)    
+    CALL <- call("continuumRemoval",q,wav,type)    
     dat <- eval(CALL)
   } else if (input$spec_fun == "bs"){
-    CALL <- call("blockScale",quote(getspec()),type=input$type_bs)
+    CALL <- call("blockScale",q,type=input$type_bs)
     dat <- eval(CALL)$Xscaled
   } else if (input$spec_fun == "bn"){
-    CALL <- call("blockNorm",quote(getspec()),input$norm)
+    CALL <- call("blockNorm",q,input$norm)
     dat <- eval(CALL)$Xscaled
   } else if (input$spec_fun == "bin"){
     if(is.na(input$nbins)&is.na(input$sbins)) return()
     if(!is.na(input$nbins)){
-      CALL <- call("binning",quote(getspec()),bins=input$nbins)
+      CALL <- call("binning",q,bins=input$nbins)
       dat <- eval(CALL)
     } else {
-      CALL <- call("binning",quote(getspec()),bin.size = input$sbins)
+      CALL <- call("binning",q,bin.size = input$sbins)
       dat <- eval(CALL)
     }
   } else if (input$spec_fun == "movav"){
-    CALL <- call("movav",quote(getspec()),input$w_mov)
+    CALL <- call("movav",q,input$w_mov)
     dat <- eval(CALL)
   } else if (input$spec_fun == "resample"){
     if(is.null(input$action_res)|input$action_res == 0) return()
     isolate({      
       try(newwav_res <- eval(parse(text=input$newwav_res)))
       if(is(newwav_res,'try-error')) return()         
-      CALL <- call("prospectr::resample",quote(getspec()),wav,newwav_res)
+      CALL <- call("prospectr::resample",q,wav,newwav_res)
       dat <- eval(CALL)
     })
   } else if (input$spec_fun == "resample2"){
@@ -326,7 +340,7 @@ getspec_trans <- reactive({
       try(fwhm <- eval(parse(text=input$fwhm))       )
       if(is(newwav_res2,'try-error')) return()   
       if(is(fwhm,'try-error')) fwhm <- NULL      
-      CALL <- call("resample2",quote(getspec()),wav,newwav_res2,fwhm)
+      CALL <- call("resample2",q,wav,newwav_res2,fwhm)
       dat <- eval(CALL)
     })
   }      
@@ -340,7 +354,7 @@ getspec_trans <- reactive({
     attr(dat,"wav_init") <- attr(getspec(),"wav_init")
   
   dat
-}) 
+} 
 
 observe({
   if(is.null(input$addtrans_spec) || input$addtrans_spec == 0) return()
@@ -373,7 +387,7 @@ plotS <- function(){
   if(!NumCh())
     stop("Error, numeric colnames are required for plot output")
   
-  p <- plotSpectra(getspec()[as.numeric(input$spec_nrRows),],wav=as.numeric(col_spec()),group=as.factor(input$spec_nrRows),
+  p <- plotSpectra(getspec_viz(),wav=as.numeric(col_spec()),group=as.factor(input$spec_nrRows),
                    wr=input$x_slider_spec,xlab=input$spec_xlab,
                    ylab=input$spec_ylab,brk=input$spec_xticks) + scale_colour_discrete("Sample ID") 
   return(p)
@@ -383,7 +397,7 @@ plotStr <- function(){
   if(is.null(getspec_trans()))
     return()
   
-  dat <- as.data.frame(getspec_trans()[as.numeric(input$spec_nrRows),])
+  dat <- as.data.frame(getspec_trans(viz=T))
   wav <- as.numeric(colnames(dat))
   p <- plotSpectra(dat,wav=wav,group=as.factor(input$spec_nrRows),
                    wr=input$x_slider_spec,xlab=input$spec_xlab,
